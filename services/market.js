@@ -2,43 +2,17 @@ var mongoose = require('mongoose'),
 	async = require('async'),
 	dateUtil = require('../utils/dateUtil'),
 	Index = mongoose.model('Index'),
-	Signal = mongoose.model('Signal');
+	Signal = mongoose.model('Signal'),
+	Market = mongoose.model('Market');
 
-var list = function list(req, res) {
-	Index.find({}, function(err, indexs) {
+
+var processIndexByName = function processIndexByName(indexName) {
+	Common.find({}).exec(function(err, common) {
 		if (err) {
 			return err;
-		}
-		res.jsonp(indexs);
-	});
-};
-
-var splitArr = function splitArr(str, callback) {
-	var arr = str.split(" ");
-	callback(arr);
-}
-
-//TODO: refactor splitArr
-
-
-var add = function add(req, res) {
-	splitArr(req.params.ticker, function(ticker) {
-		Index.create({
-			name: req.params.name,
-			tickers: ticker
-		}, function(err, indexs) {
-			if (err) {
-				return err;
-			}
-			res.send("done");
-		})
-	})
-}
-
-// Parse day in yyyymmdd format
-var showIndexInforByNameAndDay = function showIndexInforByNameAndDay(req, res) {
+		};
 		Index.find({
-			name: req.params.index
+			name: indexName
 		}).sort({
 			'day': 1
 		}).exec(function(err, indexes) {
@@ -47,6 +21,8 @@ var showIndexInforByNameAndDay = function showIndexInforByNameAndDay(req, res) {
 			}
 			var sumState = 0;
 			var indexSignal = {
+				name: indexName,
+				state: 0,
 				under4: 0,
 				under3: 0,
 				under2: 0,
@@ -55,13 +31,12 @@ var showIndexInforByNameAndDay = function showIndexInforByNameAndDay(req, res) {
 				over1: 0,
 				over2: 0,
 				over3: 0,
-				over4: 0,
-				state: 0
+				over4: 0
 			};
 			async.each(indexes[0].tickers, function(ticker, callback) {
 				Signal.find({
 					ticker: ticker,
-					day: dateUtil.parseDate(req.params.day)
+					day: common[0].latestUpdate
 				}).sort({
 					'day': 1
 				}).exec(function(err, signals) {
@@ -95,14 +70,36 @@ var showIndexInforByNameAndDay = function showIndexInforByNameAndDay(req, res) {
 					return err;
 				}
 				indexSignal.state = sumState / indexes[0].tickers.length;
-				res.jsonp(indexSignal);
+				Market.findOne({
+					name: indexName
+				}, function(err, doc) {
+					doc = indexSignal;
+					doc.save();
+				})
 			})
 		})
-	}
-	//TODO: add more services function here
+	})
+}
+
+var processIndexByUpdate = function processIndexByUpdate() {
+	Index.find({}).exec(function(err, indexes) {
+		if (err) {
+			return err;
+		};
+		async.each(indexes, function(index, callback) {
+			processIndexByName(index.name);
+			callback();
+		}, function(err) {
+			if (err) {
+				return err;
+			}
+			console.log("done process index !!");
+		});
+	})
+}
+
 
 module.exports = {
-	list: list,
-	add: add,
-	showIndexInforByNameAndDay: showIndexInforByNameAndDay
-};
+	processIndexByName: processIndexByName,
+	processIndexByUpdate: processIndexByUpdate
+}

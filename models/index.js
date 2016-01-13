@@ -6,7 +6,6 @@ var IndexSchema = new Schema({
 		type: String,
 		trim: true
 	},
-	day: Date,
 	tickers: [String]
 });
 

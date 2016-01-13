@@ -10,7 +10,7 @@ var async = require('async');
 var getAllTicker = function getAllTicker(arr) {
     var tickerArr = [];
     var ticker = "";
-    for (var i = 1; i < arr.length; i++) {
+    for (var i = 0; i < arr.length; i++) {
         if (arr[i].ticker !== ticker) {
             tickerArr.push(arr[i].ticker);
         }
@@ -47,8 +47,7 @@ var getAllState = function getAllState(data, ticker, callback) {
             for (var i = 0; i < results[0].state.length; i++) {
                 if (results[0].state[i] === false || results[1].state[i] === false || results[2].state[i] === false || results[3].state[i] === false) {
                     newArr.push(false);
-                }
-                else {
+                } else {
                     newArr.push(results[0].state[i] + results[1].state[i] + results[2].state[i] + results[3].state[i]);
                 }
             };
@@ -97,8 +96,8 @@ var translateData = function translateData(arr) {
 }
 
 module.exports = {
-    getAllTicker:getAllTicker,
-    getAllState:getAllState,
-    process:process,
-    translateData:translateData
+    getAllTicker: getAllTicker,
+    getAllState: getAllState,
+    process: process,
+    translateData: translateData
 }

@@ -9,19 +9,28 @@ var bodyParser = require('body-parser');
 var eodModel = require('./models/eod');
 var signalModel = require('./models/signal');
 var indexModel = require('./models/index');
+var tickerModel = require('./models/ticker');
+var userModel = require('./models/user');
+var commonModel = require('./models/common');
+var marketModel = require('./models/market');
+
 
 var coreService = require('./services/core');
 var eodService = require('./services/eod');
 var signalService = require('./services/signal');
 var indexService = require('./services/index');
+var tickerService = require('./services/ticker');
+var userService = require('./services/user');
 
 var coreRoutes = require('./routes/core');
 var eodRoutes = require('./routes/eod');
 var signalRoutes = require('./routes/signal');
 var indexRoutes = require('./routes/index');
+var tickerRoutes = require('./routes/ticker');
+var userRoutes = require('./routes/user');
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/stock');
+mongoose.connect('mongodb://localhost/test');
 
 var app = express();
 
@@ -41,6 +50,8 @@ app.use('/', coreRoutes);
 app.use('/eod', eodRoutes);
 app.use('/signal', signalRoutes);
 app.use('/index', indexRoutes);
+app.use('/ticker', tickerRoutes);
+app.use('/user', userRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

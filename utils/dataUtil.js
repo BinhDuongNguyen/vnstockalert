@@ -18,7 +18,7 @@ var caculateSMA = function caculateSMA(arr, inTimePeriod, callback) {
                 ret.sma.push(false);
             }
             else {
-                ret.sma.push(result.result.outReal[i - inTimePeriod]);
+                ret.sma.push(result.result.outReal[i - inTimePeriod + 1]);
             }
         }
         callback(ret);
@@ -32,7 +32,7 @@ var caculateMACD = function caculateMACD(arr, inFast, inSlow, inSignal, callback
         outMACDSignal: [],
         outMACDHist: [],
     };
-    var inTimePeriod = inSlow + inSignal;
+    var inTimePeriod = 33;
     talib.execute({
         name: "MACD",
         startIdx: 0,
@@ -189,7 +189,7 @@ var getMACDState = function getMACDState(arr, ticker, callback) {
     caculateMACD(data, 12, 26, 9, function(ret) {
         var obj = {
             day: data.day,
-            state: getState(ret.outMACDSignal, ret.outMACD)
+            state: getState(ret.outMACD, ret.outMACDSignal)
         };
         callback(obj);
     })
